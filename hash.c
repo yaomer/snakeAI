@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
-#include <assert.h>
 #include "common.h"
 #include "snake.h"
 #include "hash.h"
@@ -52,7 +48,7 @@ num_bit(int x)
 }
 
 static unsigned
-hash(Node *s)
+hash(Path *s)
 {
     unsigned hashval;
 
@@ -62,7 +58,7 @@ hash(Node *s)
 }
 
 _Hash *
-ht_search(Hash *ht, Node *s)
+ht_search(Hash *ht, Path *s)
 {
     _Hash *np;
 
@@ -74,7 +70,7 @@ ht_search(Hash *ht, Node *s)
 }
 
 void
-ht_insert(Hash *ht, Node *s, Node *pres)
+ht_insert(Hash *ht, Path *s, Path *pres)
 {
     _Hash *np;
     unsigned hashval;
@@ -82,8 +78,8 @@ ht_insert(Hash *ht, Node *s, Node *pres)
     assert(ht && s);
     hashval = hash(s);
     malloc_node(np, _Hash);
-    copy_node(np->s, s, Node);
-    copy_node(np->pres, pres, Node);
+    copy_node(np->s, s, Path);
+    copy_node(np->pres, pres, Path);
     np->next = ht->hashtab[hashval];
     ht->hashtab[hashval] = np;
 }

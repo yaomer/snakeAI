@@ -6,8 +6,8 @@
 #define HASHSIZE 12345
 
 typedef struct hash {
-    Node *s;
-    Node *pres;
+    Path *s;
+    Path *pres;
     struct hash *next;
 } _Hash;
 
@@ -16,8 +16,8 @@ typedef struct {
 } Hash;
 
 Hash    *ht_init(void);
-_Hash   *ht_search(Hash *, Node *);
-void    ht_insert(Hash *, Node *, Node *);
+_Hash   *ht_search(Hash *, Path *);
+void    ht_insert(Hash *, Path *, Path *);
 void    ht_destroy(Hash **);
 
 #endif  /* _HASH_H */

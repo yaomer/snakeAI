@@ -3,7 +3,17 @@
 
 #define DELAY   20    /*  设置延时  */
 
+#define LINES 33
+#define COLS 123
 #define isok(x, y)  ((x) >= 3 && (x) <= (LINES - 3) && (y) >= 4 && (y) <= (COLS - 5))
+
+typedef struct {
+    int x;
+    int y;
+    int _f;
+    int _g;
+    int _h;
+} Path;
 
 typedef struct {
     int x;
@@ -15,6 +25,7 @@ typedef struct {
 extern Snake *snake;
 extern Node next_step;
 extern Node food;
+extern int findtail;
 
 void    init(void);
 void    swait(void);

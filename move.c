@@ -1,17 +1,12 @@
 #include <curses.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
 #include <time.h>
 #include "common.h"
 #include "snake.h"
 #include "move.h"
 
 Snake *snake;
-Node next_step;
 Node food;
-int findtail;
-extern int dx[], dy[];
+int find_tail;
 
 void
 display_snake(int signo)
@@ -19,65 +14,32 @@ display_snake(int signo)
     Node *head = snake->head->s;
     Node *tail = snake->tail->s;
 
-    if (bfs(head->x, head->y, food.x, food.y)) {   /* 能吃到食物 */
+    if (search_min_path(head->x, head->y, food.x, food.y)) {
         int tx = next_step.x;
         int ty = next_step.y;
-        findtail = 1;
-        if (bfs(next_step.x, next_step.y, tail->x, tail->y))  /* 吃完后能找到自己的尾巴 */
-            add_snake(tx, ty);  /* 去吃 */
+        find_tail = 1;
+        if (search_min_path(tx, ty, tail->x, tail->y))
+            add_snake(tx, ty);
         else {
-            if (dfs(head->x, head->y, tail->x, tail->y))
-                add_snake(next_step.x, next_step.y);  /* 追着自己的尾巴走一步 */
+            if (search_max_path(head->x, head->y, tail->x, tail->y))
+                add_snake(next_step.x, next_step.y);
             else
-                around();  /* 随便逛逛 */
+                wander();
         }
     } else {
-        findtail = 1;
-        if (dfs(head->x, head->y, tail->x, tail->y))
+        find_tail = 1;
+        if (search_max_path(head->x, head->y, tail->x, tail->y))
             add_snake(next_step.x, next_step.y);
         else
-            around();
+            wander();
     }
-    findtail = 0;
+    find_tail = 0;
 
     if (is_eat_food())
         creat_food();
     else
         del_snake();
     refresh();
-}
-
-void
-around(void)
-{
-    int max = 0, j = -1;
-    Node *head = snake->head->s;
-    Node *tail = snake->tail->s;
-
-    findtail = 0;
-    for (int i = 0; i < 4; i++) {
-        int tx = head->x + dx[i];
-        int ty = head->y + dy[i];
-        if (isok(tx, ty) && !is_crash_snake(tx, ty)
-                && dfs(tx, ty, tail->x, tail->y)) {
-            if (max < abs(food.x - tx) + abs(food.y - ty)) {
-                max = abs(food.x - tx) + abs(food.y - ty);
-                j = i;
-            }
-        }
-    }
-    if (j == -1)
-        for (int i = 0; i < 4; i++) {
-            int tx = head->x + dx[i];
-            int ty = head->y + dy[i];
-            if (isok(tx, ty) && !is_crash_snake(tx, ty)) {
-                if (max < abs(food.x - tx) + abs(food.y - ty)) {
-                    max = abs(food.x - tx) + abs(food.y - ty);
-                    j = i;
-                }
-            }
-        }
-    add_snake(head->x + dx[j], head->y + dy[j]);
 }
 
 int
@@ -92,18 +54,19 @@ is_crash_snake(int x, int y)
 {
     _Snake *p = snake->tail;
 
-    if (findtail)
+    if (find_tail) {
         while (p) {
             if (p != snake->tail && x == p->s->x && y == p->s->y)
                 return 1;
             p = p->next;
         }
-    else
+    } else {
         while (p) {
             if (x == p->s->x && y == p->s->y)
                 return 1;
             p = p->next;
         }
+    }
     return 0;
 }
 

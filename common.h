@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdarg.h>
+#include <assert.h>
 
 #define malloc_node(p, type) (assert(p = malloc(sizeof(type))))
 
@@ -17,7 +17,7 @@
 
 #define copy_node(p1, p2, type) do {  \
     if (p2) {  \
-        malloc_node(p1, p2);  \
+        malloc_node(p1, type);  \
         memcpy(p1, p2, sizeof(type));  \
     } else  \
         p1 = p2;  \
