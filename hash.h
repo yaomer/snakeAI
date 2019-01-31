@@ -3,7 +3,7 @@
 
 #include "snake.h"
 
-#define HASHSIZE 12345
+#define HASHSIZE 3456 
 
 typedef struct hash {
     Path *s;

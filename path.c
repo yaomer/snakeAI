@@ -5,8 +5,12 @@
 #include "hash.h"
 #include "snake.h"
 
-int open[34][124];
-int close[34][124];
+/*
+ * LINES - 4 = 29
+ * COLS - 35 = 98
+ */
+int open[30][99];
+int close[30][99];
 int dx[] = {0, 2, 0, -2};
 int dy[] = {2, 0, -2, 0};
 

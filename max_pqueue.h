@@ -3,7 +3,7 @@
 
 #include "snake.h"
 
-#define MAXVAL (34 * 124 + 1)
+#define MAXVAL (30 * 99 + 1)
 
 typedef struct {
     int pqsize;

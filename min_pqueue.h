@@ -7,7 +7,7 @@
  * LINES = 33
  * COLS = 123
  */
-#define MAXVAL (34 * 124 + 1)
+#define MAXVAL (30 * 99 + 1)
 
 typedef struct {
     int pqsize;

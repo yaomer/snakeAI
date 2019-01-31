@@ -3,9 +3,7 @@
 
 #define DELAY   20    /*  设置延时  */
 
-#define LINES 33
-#define COLS 123
-#define isok(x, y)  ((x) >= 3 && (x) <= (LINES - 3) && (y) >= 4 && (y) <= (COLS - 5))
+#define isok(x, y)  ((x) >= 3 && (x) <= (LINES - 4) && (y) >= 4 && (y) <= (COLS - 35))
 
 typedef struct {
     int x;

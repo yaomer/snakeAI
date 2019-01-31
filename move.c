@@ -1,5 +1,6 @@
 #include <curses.h>
 #include <time.h>
+#include <unistd.h>
 #include "common.h"
 #include "snake.h"
 #include "move.h"
@@ -7,6 +8,7 @@
 Snake *snake;
 Node food;
 int find_tail;
+int score;
 
 void
 display_snake(int signo)
@@ -35,11 +37,23 @@ display_snake(int signo)
     }
     find_tail = 0;
 
-    if (is_eat_food())
+    if (is_eat_food()) {
+        display_score();
         creat_food();
-    else
+    } else
         del_snake();
     refresh();
+}
+
+void
+display_score(void)
+{
+    attron(COLOR_PAIR(5));
+    if (score == 600)
+        over();
+    mvaddstr(11, 97, "^o^YOUR SCORE^o^");
+    mvprintw(12, 104, "%d", ++score);
+    attroff(COLOR_PAIR(5));
 }
 
 int
@@ -136,9 +150,9 @@ creat_snake(void)
     malloc_node(snake->head->s, Node);
     snake->head->next = NULL;
     srand(clock());
-    while ((snake->head->s->x = rand() % (LINES - 5) + 3) % 2 == 0)
+    while ((snake->head->s->x = rand() % (LINES - 6) + 3) % 2 == 0)
         ;
-    while ((snake->head->s->y = rand() % (COLS - 8) + 4) % 2 != 0)
+    while ((snake->head->s->y = rand() % (COLS - 38) + 4) % 2 != 0)
         ;
     attron(COLOR_PAIR(1));
     mvaddch(snake->head->s->x, snake->head->s->y, ' ');
@@ -148,13 +162,25 @@ creat_snake(void)
 void creat_food(void)
 {
     srand(clock());
-    while ((food.x = rand() % (LINES - 5) + 3) % 2 == 0)
+    while ((food.x = rand() % (LINES - 6) + 3) % 2 == 0)
         ;
-    while ((food.y = rand() % (COLS - 8) + 4) % 2 != 0)
+    while ((food.y = rand() % (COLS - 38) + 4) % 2 != 0)
         ;
     if (is_crash_snake(food.x, food.y))   /*  食物不能覆盖蛇身  */
         creat_food();
     attron(COLOR_PAIR(2));
     mvaddch(food.x, food.y, ' ');
     attroff(COLOR_PAIR(2));
+}
+
+void
+over(void)
+{
+    attron(COLOR_PAIR(5));
+    mvaddstr(15, 40, "GAME OVER");
+    attroff(COLOR_PAIR(5));
+    refresh();
+    sleep(5);
+    endwin();
+    exit(0);
 }

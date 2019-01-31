@@ -50,17 +50,18 @@ draw_map(void)
     attron(COLOR_PAIR(4));
     for (i = 3; i < COLS - 2; i += 2) {
         mvaddch(2, i, ' ');
-        mvaddch(LINES - 2, i, ' ');
+        mvaddch(LINES - 3, i, ' ');
     }
-    for (i = 3; i < LINES - 1; i += 2) {
+    for (i = 3; i < LINES - 2; i += 2) {
         mvaddch(i, 3, ' ');
+        mvaddch(i, COLS - 34, ' ');
         mvaddch(i, COLS - 4, ' ');
     }
     attroff(COLOR_PAIR(4));
     /* 测试地图的边界 */
     /* mvaddch(3, 4, 'A');
-    mvaddch(LINES - 3, 4, 'B');
-    mvaddch(3, COLS - 5, 'C');
-    mvaddch(LINES - 3, COLS - 5, 'C');
+    mvaddch(LINES - 4, 4, 'B');
+    mvaddch(3, COLS - 35, 'C');
+    mvaddch(LINES - 4, COLS - 35, 'C');
     mvprintw(10, 10, "%d %d\n", LINES, COLS); */
 }
