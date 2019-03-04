@@ -82,33 +82,3 @@ max_pq_pop(Max_pqueue *p)
     max_heap(p, 1);
     return s;
 }
-/*
-int
-main(void)
-{
-    Path *s[4];
-    Max_pqueue *p = max_pq_init();
-
-    for (int i = 0; i < 4; i++) {
-        malloc_node(s[i], Path);
-    }
-
-    s[0]->_f = 1;
-    s[1]->_f = 5;
-    s[2]->_f = 8;
-    s[3]->_f = 6;
-
-    max_pq_push(p, s[0]);
-    max_pq_push(p, s[1]);
-    max_pq_push(p, s[2]);
-    max_pq_push(p, s[3]);
-
-    Path *t = max_pq_pop(p);
-    printf("%d\n", t->_f);
-    t = max_pq_pop(p);
-    printf("%d\n", t->_f);
-    t = max_pq_pop(p);
-    printf("%d\n", t->_f);
-    t = max_pq_pop(p);
-    printf("%d\n", t->_f);
-} */
