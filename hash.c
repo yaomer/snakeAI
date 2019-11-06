@@ -1,6 +1,6 @@
 #include <math.h>
+
 #include "common.h"
-#include "snake.h"
 #include "hash.h"
 
 Hash *
@@ -17,9 +17,8 @@ ht_init(void)
 void
 ht_destroy(Hash **ht)
 {
-    _Hash *np, *tmp;
+    struct hash_node *np, *tmp;
 
-    assert(ht && *ht);
     for (int i = 0; i < HASHSIZE; i++) {
         if ((np = (*ht)->hashtab[i]))
             while (np) {
@@ -52,17 +51,15 @@ hash(Path *s)
 {
     unsigned hashval;
 
-    assert(s);
     hashval = s->x * pow(10, num_bit(s->y)) + s->y;
     return hashval % HASHSIZE;
 }
 
-_Hash *
+struct hash_node *
 ht_search(Hash *ht, Path *s)
 {
-    _Hash *np;
+    struct hash_node *np;
 
-    assert(ht && s);
     for (np = ht->hashtab[hash(s)]; np; np = np->next)
         if (np->s->x == s->x && np->s->y == s->y)
             break;
@@ -72,12 +69,11 @@ ht_search(Hash *ht, Path *s)
 void
 ht_insert(Hash *ht, Path *s, Path *pres)
 {
-    _Hash *np;
+    struct hash_node *np;
     unsigned hashval;
 
-    assert(ht && s);
     hashval = hash(s);
-    malloc_node(np, _Hash);
+    malloc_node(np, struct hash_node);
     copy_node(np->s, s, Path);
     copy_node(np->pres, pres, Path);
     np->next = ht->hashtab[hashval];

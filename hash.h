@@ -1,22 +1,22 @@
 #ifndef _HASH_H
 #define _HASH_H
 
-#include "snake.h"
+#include "path.h"
 
-#define HASHSIZE 3456 
+#define HASHSIZE 3456
 
-typedef struct hash {
+struct hash_node {
     Path *s;
     Path *pres;
-    struct hash *next;
-} _Hash;
+    struct hash_node *next;
+};
 
 typedef struct {
-    _Hash *hashtab[HASHSIZE];
+    struct hash_node *hashtab[HASHSIZE];
 } Hash;
 
 Hash    *ht_init(void);
-_Hash   *ht_search(Hash *, Path *);
+struct hash_node   *ht_search(Hash *, Path *);
 void    ht_insert(Hash *, Path *, Path *);
 void    ht_destroy(Hash **);
 

@@ -1,62 +1,17 @@
 #include <curses.h>
 #include <time.h>
 #include <unistd.h>
+
 #include "common.h"
-#include "snake.h"
 #include "move.h"
+#include "path.h"
 
 Snake *snake;
 Node food;
-int find_tail;
-int score;
+static int find_tail;
+extern Node next_step;
 
-void
-display_snake(int signo)
-{
-    Node *head = snake->head->s;
-    Node *tail = snake->tail->s;
-
-    if (search_min_path(head->x, head->y, food.x, food.y)) {
-        int tx = next_step.x;
-        int ty = next_step.y;
-        find_tail = 1;
-        if (search_min_path(tx, ty, tail->x, tail->y))
-            add_snake(tx, ty);
-        else {
-            if (search_max_path(head->x, head->y, tail->x, tail->y))
-                add_snake(next_step.x, next_step.y);
-            else
-                wander();
-        }
-    } else {
-        find_tail = 1;
-        if (search_max_path(head->x, head->y, tail->x, tail->y))
-            add_snake(next_step.x, next_step.y);
-        else
-            wander();
-    }
-    find_tail = 0;
-
-    if (is_eat_food()) {
-        display_score();
-        creat_food();
-    } else
-        del_snake();
-    refresh();
-}
-
-void
-display_score(void)
-{
-    attron(COLOR_PAIR(5));
-    if (score == 600)
-        over();
-    mvaddstr(11, 97, "^o^YOUR SCORE^o^");
-    mvprintw(12, 104, "%d", ++score);
-    attroff(COLOR_PAIR(5));
-}
-
-int
+static int
 is_eat_food(void)
 {
     return snake->head->s->x == food.x
@@ -66,7 +21,7 @@ is_eat_food(void)
 int
 is_crash_snake(int x, int y)
 {
-    _Snake *p = snake->tail;
+    struct snake_node *p = snake->tail;
 
     if (find_tail) {
         while (p) {
@@ -84,6 +39,84 @@ is_crash_snake(int x, int y)
     return 0;
 }
 
+static void
+over(void)
+{
+    attron(COLOR_PAIR(5));
+    mvaddstr(15, 40, "GAME OVER");
+    attroff(COLOR_PAIR(5));
+    refresh();
+    sleep(5);
+    endwin();
+    exit(0);
+}
+
+static int
+can_find_path_to_eat_food(void)
+{
+    Node *head = snake->head->s;
+    return search_min_path(head->x, head->y, food.x, food.y);
+}
+
+static int
+can_find_tail_after_eat_food(int x, int y)
+{
+    Node *tail = snake->tail->s;
+    return search_min_path(x, y, tail->x, tail->y);
+}
+
+static int
+can_find_tail(void)
+{
+    Node *head = snake->head->s;
+    Node *tail = snake->tail->s;
+    return search_min_path(head->x, head->y, tail->x, tail->y);
+}
+
+void
+display_snake(int signo)
+{
+    if (can_find_path_to_eat_food()) {
+        int tx = next_step.x;
+        int ty = next_step.y;
+        find_tail = 1;
+        if (can_find_tail_after_eat_food(tx, ty)) {
+            add_snake(tx, ty);
+        } else {
+            if (can_find_tail()) {
+                add_snake(next_step.x, next_step.y);
+            } else
+                wander();
+        }
+    } else {
+        find_tail = 1;
+        if (can_find_tail()) {
+            add_snake(next_step.x, next_step.y);
+        } else
+            wander();
+    }
+    find_tail = 0;
+
+    if (is_eat_food()) {
+        display_score();
+        creat_food();
+    } else
+        del_snake();
+    refresh();
+}
+
+void
+display_score(void)
+{
+    static int score = 0;
+    attron(COLOR_PAIR(5));
+    if (score == 600)
+        over();
+    mvaddstr(11, 97, "^o^YOUR SCORE^o^");
+    mvprintw(12, 104, "%d", ++score);
+    attroff(COLOR_PAIR(5));
+}
+
 void
 init_snake(void)
 {
@@ -94,11 +127,11 @@ init_snake(void)
 void
 add_snake(int x, int y)
 {
-    _Snake *p, *q;
+    struct snake_node *p, *q;
 
-    malloc_node(p, _Snake);
+    malloc_node(p, struct snake_node);
     malloc_node(p->s, Node);
-    malloc_node(q, _Snake);
+    malloc_node(q, struct snake_node);
     malloc_node(q->s, Node);
 
     snake->head->next = p;
@@ -118,22 +151,22 @@ add_snake(int x, int y)
 void
 del_snake(void)
 {
-    _Snake *tmp;
+    struct snake_node *tail = snake->tail;
+    struct snake_node *tmp = tail->next->next;
 
-    mvaddch(snake->tail->s->x, snake->tail->s->y, ' ');
-    mvaddch(snake->tail->next->s->x, snake->tail->next->s->y, ' ');
-    tmp = snake->tail->next->next;
-    free(snake->tail->next->s);
-    free(snake->tail->next);
-    free(snake->tail->s);
-    free(snake->tail);
+    mvaddch(tail->s->x, tail->s->y, ' ');
+    mvaddch(tail->next->s->x, tail->next->s->y, ' ');
+    free(tail->next->s);
+    free(tail->next);
+    free(tail->s);
+    free(tail);
     snake->tail = tmp;
 }
 
 void
 clear_snake(void)
 {
-    _Snake *tmp;
+    struct snake_node *tmp;
 
     while (snake->tail) {
         tmp = snake->tail->next;
@@ -146,7 +179,7 @@ clear_snake(void)
 void
 creat_snake(void)
 {
-    malloc_node(snake->head = snake->tail, _Snake);
+    malloc_node(snake->head = snake->tail, struct snake_node);
     malloc_node(snake->head->s, Node);
     snake->head->next = NULL;
     srand(clock());
@@ -171,16 +204,4 @@ void creat_food(void)
     attron(COLOR_PAIR(2));
     mvaddch(food.x, food.y, ' ');
     attroff(COLOR_PAIR(2));
-}
-
-void
-over(void)
-{
-    attron(COLOR_PAIR(5));
-    mvaddstr(15, 40, "GAME OVER");
-    attroff(COLOR_PAIR(5));
-    refresh();
-    sleep(5);
-    endwin();
-    exit(0);
 }
